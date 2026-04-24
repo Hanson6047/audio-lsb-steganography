@@ -14,6 +14,11 @@ Thumbs.db
 data/output/*
 !data/output/.gitkeep
 
-# Large audio files
+# Large audio files（output 不上傳，以下範例檔案允許上傳）
 *.wav
 *.mp3
+!data/cover/PeopleSound_34sec-UCRoger.wav
+!data/cover/Song_2min-Case.wav
+!data/cover/Song_34sec-host5.wav
+!data/secret/PeopleSound_05sec-N2.wav
+!data/secret/PeopleSound_12sec-N1.wav
