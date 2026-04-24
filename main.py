@@ -65,12 +65,12 @@ def interactive_encode_text():
         print("  句子不能為空，操作取消。")
         return
 
-    # 步驟 3：設定輸出檔名（可按 Enter 使用預設值）
-    output_name = input("  請輸入輸出檔案名稱（按 Enter 使用預設 stego.wav）：").strip()
-    if not output_name:
-        output_name = "stego.wav"
-    if not output_name.lower().endswith('.wav'):
-        output_name += '.wav'
+    # 步驟 3：輸入前綴，自動加上 _stego.wav
+    cover_basename = os.path.splitext(os.path.basename(cover_path))[0]
+    prefix = input(f"  請輸入輸出檔案名稱前綴（按 Enter 使用預設「{cover_basename}」）：").strip()
+    if not prefix:
+        prefix = cover_basename
+    output_name = prefix + "_stego.wav"
 
     output_path = os.path.join("data/output", output_name)
 
