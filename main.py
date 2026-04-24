@@ -11,6 +11,7 @@ import argparse
 import os
 import sys
 from src.text_steg import hide_text_in_wav, extract_text_from_wav
+from src.audio_steg import hide_audio_in_wav, extract_audio_from_wav
 
 
 # ──────────────────────────────────────────
@@ -95,6 +96,79 @@ def interactive_decode_text():
     print(f"  取出訊息：{message}")
 
 
+def interactive_encode_audio():
+    """互動式語音藏語音：引導使用者選擇 cover 和 secret 檔案，輸出到 data/output/audio/"""
+    print("\n【語音藏語音 — 藏入】把短音訊藏進長音訊")
+    print("-" * 36)
+
+    # 步驟 1：選擇 cover 音訊
+    cover_path = choose_file("data/cover", "請選擇 cover 音訊（用來藏東西的容器）：")
+    if cover_path is None:
+        return
+
+    # 步驟 2：選擇 secret 音訊
+    secret_path = choose_file("data/secret", "請選擇要隱藏的 secret 音訊：")
+    if secret_path is None:
+        return
+
+    # 步驟 3：輸入前綴，自動加上 _audio_stego.wav
+    prefix = input("\n  請輸入輸出檔案名稱前綴（按 Enter 使用預設「default」）：").strip()
+    if not prefix:
+        prefix = "default"
+    output_name = prefix + "_audio_stego.wav"
+
+    # 確保輸出子資料夾存在
+    output_dir = os.path.join("data", "output", "audio")
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, output_name)
+
+    # 執行藏入
+    print()
+    hide_audio_in_wav(cover_path, secret_path, output_path)
+
+
+def interactive_decode_audio():
+    """互動式語音取出：從 data/output/audio/ 選擇 stego 檔，取出並加上 extracted_ 前綴"""
+    print("\n【語音藏語音 — 取出】從 stego 音訊還原隱藏的音訊")
+    print("-" * 36)
+
+    output_dir = os.path.join("data", "output", "audio")
+
+    # 選擇 stego 檔案
+    stego_path = choose_file(output_dir, "請選擇要取出的 stego WAV 檔案：")
+    if stego_path is None:
+        return
+
+    # 輸出檔名自動加上 extracted_ 前綴
+    stego_name = os.path.basename(stego_path)
+    output_name = "extracted_" + stego_name
+    output_path = os.path.join(output_dir, output_name)
+
+    # 執行取出
+    print()
+    extract_audio_from_wav(stego_path, output_path)
+
+
+def interactive_audio_menu():
+    """語音藏語音的子選單"""
+    while True:
+        print("\n【語音藏語音】請選擇：")
+        print("  1. 藏入（把短音訊藏進長音訊）")
+        print("  2. 取出（從 stego 音訊還原）")
+        print("  0. 返回主選單")
+
+        choice = input("\n  請輸入數字：").strip()
+
+        if choice == "1":
+            interactive_encode_audio()
+        elif choice == "2":
+            interactive_decode_audio()
+        elif choice == "0":
+            break
+        else:
+            print("  請輸入 0 到 2 之間的數字。")
+
+
 def interactive_mode():
     """互動式主選單，讓使用者用數字選擇要執行的功能"""
     print("=" * 40)
@@ -105,7 +179,7 @@ def interactive_mode():
         print("\n請選擇功能：")
         print("  1. 句子編碼（把文字藏進音訊）")
         print("  2. 句子解碼（從音訊取出文字）")
-        print("  3. 語音藏語音（Stage 6，尚未實作）")
+        print("  3. 語音藏語音（藏入 / 取出）")
         print("  0. 離開")
 
         choice = input("\n請輸入數字：").strip()
@@ -115,7 +189,7 @@ def interactive_mode():
         elif choice == "2":
             interactive_decode_text()
         elif choice == "3":
-            print("\n  此功能尚未實作，完成 Stage 6 後即可使用。")
+            interactive_audio_menu()
         elif choice == "0":
             print("\n  再見！")
             break
